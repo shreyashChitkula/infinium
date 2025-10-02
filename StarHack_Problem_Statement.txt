@@ -1,0 +1,153 @@
+YouMatter Gamification Challenge
+About YouMatter:
+YouMatter is a comprehensive mobile wellness platform that empowers users to take control
+of their Health, Wealth, and Financial Wellness through integrated digital solutions. The app
+combines health tracking with insurance services to create a holistic wellness ecosystem.
+
+Primary Objective:
+Design and develop innovative gamification modules that will significantly enhance user
+engagement, increase Daily Active Users (DAU) and Monthly Active Users (MAU), and drive
+organic app downloads for the YouMatter platform.
+Key Performance Indicators:
+•
+
+Increase DAU by 40% through engaging daily interactions
+
+•
+
+Drive organic downloads by 50% through viral and social features
+
+•
+
+Improve feature adoption by 60% across all wellness categories
+
+Problem Areas to Address:
+User Engagement Challenges
+1. Feature Discovery Gap: Users utilize very few features on application ( Policy
+Servicing, Aktivo constitute for 60% of total used features)
+2. Motivation Decline: Initial enthusiasm drops.
+3. Passive Interaction: No user-generated content and peer engagement
+Behavioral Psychology Opportunities
+•
+
+Leverage habit formation through consistent micro-rewards
+
+•
+
+Create social accountability mechanisms
+
+•
+
+Design progressive achievement systems
+
+•
+
+Implement personalized challenge frameworks
+
+Gamification Focus Areas
+1. Health & Fitness Gamification
+2. Wellness Journey Gamification
+3. Insurance Engagement Gamification
+4. Social & Community Features
+
+Innovation Tracks
+Track 1: Behavioural Psychology Integration
+Leverage advanced psychological principles to drive engagement:
+•
+
+Cognitive Behavioural Techniques: Gamified mental wellness interventions
+
+•
+
+Habit Formation Science: Evidence-based behaviour changes mechanisms
+
+•
+
+Personalization Algorithms: AI-driven individual motivation profiling
+
+•
+
+Neuroscience Applications: Brain-friendly reward timing and feedback
+
+Track 2: Emerging Technology Integration
+Incorporate cutting-edge technologies for enhanced experiences:
+•
+
+Augmented Reality: AR-based exercise guidance and health visualization
+
+•
+
+Machine Learning: Predictive challenges based on user patterns
+
+•
+
+IoT Integration: Seamless wearable device connectivity
+
+•
+
+Blockchain Rewards: Transparent, transferable health achievement tokens
+
+Track 3: Social Impact Gamification
+Create positive societal impact through individual wellness:
+•
+
+Community Health Challenges: Collective wellness goal achievement
+
+•
+
+Corporate Wellness Integration: Employer-sponsored health competitions
+
+•
+
+Healthcare Provider Partnerships: Doctor-prescribed gamified interventions
+
+•
+
+Public Health Campaigns: Population-level health improvement games
+
+Deliverables:
+Minimum Viable Product (MVP)
+1. Core Gamification Engine: Basic reward and progression system
+2. User Interface Mockups: High-fidelity design prototypes
+3. Technical Architecture: Detailed system design and API specifications
+4. User Journey Maps: Comprehensive engagement flow documentation
+5. Metrics Dashboard: KPI tracking and analytics framework
+
+Advanced Submissions
+1. Working Prototype: Functional gamification module demonstration
+2. AI/ML Components: Intelligent personalization and recommendation systems
+3. Social Features: Community building and viral growth mechanisms
+4. Business Model Integration: Revenue enhancement through gamification
+5. Scalability Plan: Technical and operational scaling strategy
+
+Documentation Requirements
+•
+
+Technical Documentation: API specifications, database schemas, system architecture
+
+•
+
+User Experience
+considerations
+
+•
+
+Business Case Analysis: ROI projections, user acquisition cost impact, retention
+modeling
+
+•
+
+Implementation Roadmap: Phased rollout plan with timeline and resource
+requirements
+
+Documentation:
+
+Wireframes,
+
+user
+
+stories,
+
+accessibility
+
+
