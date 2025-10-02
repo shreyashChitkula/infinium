@@ -41,8 +41,422 @@
 - **Runtime:** Node.js with Express framework
 - **Database:** SQLite3 with comprehensive schema
 - **Authentication:** JWT tokens with bcrypt hashing
-- **Testing:** Automated test suite with 10 test cases
+- **Testing:** Automated test suite with 15 test cases
 - **Documentation:** Swagger/OpenAPI specification
+
+## Core Features
+
+### 1. Authentication & User Management
+- Secure user registration and login
+- JWT-based authentication
+- Password hashing using bcrypt
+- Profile management and customization
+- Session handling and token management
+
+### 2. Event System
+- Comprehensive event tracking
+- Supported event types:
+  ```javascript
+  {
+    DAILY_LOGIN: { type: 'daily_login', points: 5 },
+    LOG_WORKOUT: { type: 'exercise', points: 10 },
+    READ_ARTICLE: { type: 'read_article', points: 7 },
+    VIEW_POLICY: { type: 'view_policy', points: 15 },
+    COMPLETE_CHALLENGE: { type: 'complete_challenge', points: 50 },
+    INVITE_FRIEND: { type: 'invite_friend', points: 20 },
+    SHARE_ACHIEVEMENT: { type: 'share_achievement', points: 5 },
+    USE_NEW_FEATURE: { type: 'use_new_feature', points: 30 },
+    HEALTH_SCORE: { type: 'health_score', points: 15 },
+    CHECKUP: { type: 'checkup', points: 25 }
+  }
+  ```
+- Event metadata tracking
+- Points system integration
+
+### 3. Challenge System
+- Personalized challenge generation
+- Progress tracking
+- Achievement system
+- Reward distribution
+- Multi-level challenges
+
+### 4. Insurance Integration
+#### Available Plans
+1. **Basic Health Coverage**
+   - Premium: $200/month
+   - Coverage: Up to $100,000
+   - Max Discount: 15%
+   - Features: Basic medical, emergency, prescriptions, annual checkup
+
+2. **Premium Health Plan**
+   - Premium: $350/month
+   - Coverage: Up to $250,000
+   - Max Discount: 25%
+   - Features: All basic features + specialists, mental health, preventive care
+
+3. **Family Coverage**
+   - Premium: $500/month
+   - Coverage: Up to $500,000
+   - Max Discount: 30%
+   - Features: All premium features + maternity, dental, vision
+
+#### Dynamic Discount System
+- **Health Score Based:**
+  ```
+  90-100: 15% discount
+  80-89:  12% discount
+  70-79:  10% discount
+  60-69:   7% discount
+  ```
+- **Activity Based:**
+  ```
+  180+ days exercise: 8% additional
+  90+ days exercise: 5% additional
+  30+ days exercise: 2% additional
+  ```
+- **Preventive Care:**
+  ```
+  Annual checkup: 3% additional
+  ```
+
+### 5. Analytics & Reporting
+- User activity tracking
+- Health metrics monitoring
+- Insurance usage analytics
+- Challenge completion rates
+- Engagement metrics
+
+## Frontend Integration Guide
+
+### 1. Project Setup
+```bash
+# Install required dependencies
+npm install axios @tanstack/react-query jwt-decode dayjs
+
+# Optional but recommended UI libraries
+npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion
+```
+
+### 2. API Client Setup
+```javascript
+// src/api/client.js
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:3001/api';
+
+export const apiClient = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+// Add auth token interceptor
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Add error handling interceptor
+apiClient.interceptors.response.use(
+    (response) => response.data,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error.response?.data || error);
+    }
+);
+```
+
+### 3. Authentication Integration
+```javascript
+// src/api/auth.js
+import { apiClient } from './client';
+
+export const authAPI = {
+    register: (userData) => 
+        apiClient.post('/auth/register', userData),
+    
+    login: (credentials) => 
+        apiClient.post('/auth/login', credentials),
+    
+    getProfile: () => 
+        apiClient.get('/auth/profile')
+};
+
+// Usage in components
+const LoginForm = () => {
+    const handleLogin = async (values) => {
+        try {
+            const { token, user } = await authAPI.login(values);
+            localStorage.setItem('token', token);
+            // Handle successful login
+        } catch (error) {
+            // Handle login error
+        }
+    };
+};
+```
+
+### 4. Event Recording
+```javascript
+// src/api/events.js
+import { apiClient } from './client';
+
+export const eventAPI = {
+    recordEvent: (eventType, metadata = {}) => 
+        apiClient.post('/events', { eventType, metadata }),
+    
+    getHistory: (params) => 
+        apiClient.get('/events/history', { params })
+};
+
+// Event recording utility
+export const recordUserAction = async (eventType, metadata) => {
+    try {
+        const result = await eventAPI.recordEvent(eventType, metadata);
+        if (result.levelUp) {
+            // Show level up celebration
+        }
+        if (result.unlockedPremiumDiscount) {
+            // Show discount unlock notification
+        }
+        return result;
+    } catch (error) {
+        console.error('Failed to record event:', error);
+    }
+};
+```
+
+### 5. Insurance Integration
+```javascript
+// src/api/insurance.js
+import { apiClient } from './client';
+
+export const insuranceAPI = {
+    getPlans: () => 
+        apiClient.get('/insurance/plans'),
+    
+    getPlan: (planId) => 
+        apiClient.get(`/insurance/plans/${planId}`),
+    
+    calculateDiscount: () => 
+        apiClient.get('/insurance/calculate-discount'),
+    
+    enroll: (planId) => 
+        apiClient.post('/insurance/enroll', { planId }),
+    
+    getCurrentPlan: () => 
+        apiClient.get('/insurance/current')
+};
+
+// React Query integration
+import { useQuery, useMutation } from '@tanstack/react-query';
+
+export const useInsurancePlans = () => {
+    return useQuery(['insurancePlans'], insuranceAPI.getPlans);
+};
+
+export const useCurrentPlan = () => {
+    return useQuery(['currentPlan'], insuranceAPI.getCurrentPlan);
+};
+
+export const useEnrollMutation = () => {
+    return useMutation(insuranceAPI.enroll);
+};
+```
+
+### 6. Real-time Updates Integration
+```javascript
+// src/hooks/useEventSocket.js
+import { useEffect, useRef } from 'react';
+import { io } from 'socket.io-client';
+
+export const useEventSocket = (onEvent) => {
+    const socket = useRef();
+
+    useEffect(() => {
+        socket.current = io('http://localhost:3001', {
+            auth: {
+                token: localStorage.getItem('token')
+            }
+        });
+
+        socket.current.on('event', onEvent);
+        
+        return () => {
+            socket.current.disconnect();
+        };
+    }, [onEvent]);
+
+    return socket.current;
+};
+```
+
+### 7. Error Handling
+```javascript
+// src/utils/errorHandler.js
+export const handleApiError = (error) => {
+    if (error.code === 'VALIDATION_ERROR') {
+        return {
+            type: 'validation',
+            message: error.message,
+            errors: error.errors
+        };
+    }
+
+    if (error.code === 'UNAUTHORIZED') {
+        return {
+            type: 'auth',
+            message: 'Please login to continue'
+        };
+    }
+
+    return {
+        type: 'general',
+        message: error.message || 'An unexpected error occurred'
+    };
+};
+```
+
+### 8. Component Examples
+
+#### Insurance Plan Card
+```jsx
+const InsurancePlanCard = ({ plan }) => {
+    const enrollMutation = useEnrollMutation();
+    const { data: discount } = useQuery(
+        ['discount'],
+        insuranceAPI.calculateDiscount
+    );
+
+    const handleEnroll = () => {
+        enrollMutation.mutate(plan.id, {
+            onSuccess: () => {
+                toast({
+                    title: 'Enrolled Successfully',
+                    description: `You've enrolled in ${plan.name}`,
+                    status: 'success'
+                });
+            }
+        });
+    };
+
+    const discountedPremium = plan.premium * (1 - (discount || 0));
+
+    return (
+        <Card>
+            <CardHeader>
+                <Heading size="md">{plan.name}</Heading>
+            </CardHeader>
+            <CardBody>
+                <VStack align="start" spacing={4}>
+                    <Text>Coverage: ${plan.coverage.toLocaleString()}</Text>
+                    <Text>
+                        Premium: ${discountedPremium.toFixed(2)}/month
+                        {discount > 0 && (
+                            <Badge ml={2} colorScheme="green">
+                                {(discount * 100).toFixed(0)}% off
+                            </Badge>
+                        )}
+                    </Text>
+                    <List spacing={2}>
+                        {Object.entries(plan.features).map(([key, enabled]) => (
+                            <ListItem key={key}>
+                                <ListIcon 
+                                    as={enabled ? CheckIcon : CloseIcon} 
+                                    color={enabled ? 'green.500' : 'red.500'} 
+                                />
+                                {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </ListItem>
+                        ))}
+                    </List>
+                </VStack>
+            </CardBody>
+            <CardFooter>
+                <Button
+                    colorScheme="blue"
+                    onClick={handleEnroll}
+                    isLoading={enrollMutation.isLoading}
+                >
+                    Enroll Now
+                </Button>
+            </CardFooter>
+        </Card>
+    );
+};
+```
+
+### 9. State Management Example
+```javascript
+// src/store/userStore.js
+import create from 'zustand';
+
+export const useUserStore = create((set) => ({
+    user: null,
+    insurancePlan: null,
+    healthScore: 0,
+    discount: 0,
+    
+    setUser: (user) => set({ user }),
+    setInsurancePlan: (plan) => set({ insurancePlan: plan }),
+    updateHealthScore: (score) => set({ healthScore: score }),
+    updateDiscount: (discount) => set({ discount }),
+    
+    reset: () => set({
+        user: null,
+        insurancePlan: null,
+        healthScore: 0,
+        discount: 0
+    })
+}));
+```
+
+## Testing
+
+### Unit Tests
+```bash
+# Install testing dependencies
+npm install --save-dev @testing-library/react @testing-library/jest-dom jest
+
+# Run tests
+npm test
+```
+
+### E2E Tests
+```bash
+# Install Cypress
+npm install --save-dev cypress
+
+# Run Cypress tests
+npm run cypress:open
+```
+
+## Security Best Practices
+
+1. **Token Management**
+   - Store JWT in httpOnly cookies
+   - Implement token refresh mechanism
+   - Clear tokens on logout
+
+2. **API Security**
+   - Use HTTPS in production
+   - Implement rate limiting
+   - Validate all inputs
+   - Sanitize responses
+
+3. **Error Handling**
+   - Never expose internal errors
+   - Log errors securely
+   - Provide user-friendly messages
 
 ## API Documentation
 
@@ -354,6 +768,138 @@ All routes may return the following error responses:
   }
 }
 ```
+
+## Insurance Plans & Performance Benefits
+
+### Available Insurance Plans
+
+#### 1. Basic Health Coverage
+- **Premium:** $200/month
+- **Coverage:** Up to $100,000
+- **Features:**
+  - Basic medical coverage
+  - Emergency services
+  - Prescription drugs
+  - Annual health checkup
+- **Performance Discount:** Up to 15% based on health score
+
+#### 2. Premium Health Plan
+- **Premium:** $350/month
+- **Coverage:** Up to $250,000
+- **Features:**
+  - Everything in Basic plan
+  - Specialist consultations
+  - Mental health coverage
+  - Preventive care
+  - Wellness programs
+- **Performance Discount:** Up to 25% based on health score
+
+#### 3. Family Coverage
+- **Premium:** $500/month
+- **Coverage:** Up to $500,000
+- **Features:**
+  - Coverage for spouse and children
+  - Maternity benefits
+  - Dental and vision
+  - Regular family checkups
+- **Performance Discount:** Up to 30% based on family health score
+
+### Performance-Based Discounts
+
+#### 1. Health Score Discounts
+| Health Score | Basic Plan | Premium Plan | Family Plan |
+|--------------|------------|--------------|-------------|
+| 90-100       | 15%        | 25%         | 30%         |
+| 80-89        | 12%        | 20%         | 25%         |
+| 70-79        | 10%        | 15%         | 20%         |
+| 60-69        | 7%         | 10%         | 15%         |
+| Below 60     | 0%         | 0%          | 0%          |
+
+#### 2. Activity-Based Benefits
+1. **Daily Exercise Tracking**
+   - 30+ days streak: Additional 2% discount
+   - 90+ days streak: Additional 5% discount
+   - 180+ days streak: Additional 8% discount
+
+2. **Preventive Health Checkups**
+   - Regular checkup completion: 3% discount
+   - Annual wellness assessment: 5% discount
+   - Vaccination schedule maintenance: 2% discount
+
+3. **Healthy Lifestyle Rewards**
+   - Maintaining BMI in healthy range: 3% discount
+   - Non-smoking status: 5% discount
+   - Regular mental health check-ins: 2% discount
+
+#### 3. Challenge Completion Benefits
+1. **Monthly Health Challenges**
+   - Bronze completion: $20 premium reduction
+   - Silver completion: $35 premium reduction
+   - Gold completion: $50 premium reduction
+
+2. **Quarterly Wellness Programs**
+   - Program completion: Up to 10% additional discount
+   - Perfect attendance: $100 wellness bonus
+   - Group challenge winner: Extra 5% discount
+
+### Special Discount Programs
+
+#### 1. Family Wellness Program
+- **Family Activity Tracking**
+  - 50% family participation: 5% extra discount
+  - 100% family participation: 10% extra discount
+  - Family challenge winners: Additional $200 annual discount
+
+#### 2. Preventive Care Incentives
+- **Annual Health Screening:** $150 premium reduction
+- **Dental Checkups:** $50 reduction per visit (max 2/year)
+- **Vision Care:** $100 reduction for annual eye exam
+
+#### 3. Chronic Condition Management
+- **Diabetes Management:** Up to 15% additional discount
+- **Hypertension Control:** Up to 12% additional discount
+- **Weight Management:** Up to 10% additional discount
+
+### How to Claim Discounts
+
+1. **Automatic Discounts**
+   - Health score discounts applied automatically monthly
+   - Activity streaks calculated and applied automatically
+   - Challenge completion rewards credited next billing cycle
+
+2. **Manual Claims**
+   - Submit preventive care documentation through portal
+   - Upload medical records for chronic condition management
+   - Family program enrollment through customer service
+
+3. **Verification Process**
+   - Health metrics verified through connected devices
+   - Medical records verified within 48 hours
+   - Challenge completions validated automatically
+
+### Discount Stacking Rules
+
+1. **Maximum Combined Discount**
+   - Basic Plan: Up to 30% total discount
+   - Premium Plan: Up to 40% total discount
+   - Family Plan: Up to 50% total discount
+
+2. **Priority Order**
+   - Base health score discount applied first
+   - Activity-based discounts second
+   - Special program discounts last
+
+3. **Annual Caps**
+   - Maximum annual discount: $2,500 for Basic
+   - Maximum annual discount: $5,000 for Premium
+   - Maximum annual discount: $7,500 for Family
+
+### Terms and Conditions
+- Discounts subject to annual review
+- Must maintain minimum health score for continued discounts
+- Fraudulent activities will result in program termination
+- Company reserves right to modify discount structure
+- 90-day waiting period for new enrollees
 
 ## Frontend Integration Guide
 

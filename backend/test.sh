@@ -24,6 +24,16 @@ print_result() {
     fi
 }
 
+# Function to verify JSON response
+verify_json_response() {
+    local response=$1
+    if echo "$response" | grep -q "\"success\":true"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 echo -e "\n${BLUE}Starting API Tests...${NC}\n"
 
 # Generate unique email for test
@@ -130,6 +140,70 @@ echo -e "\n${BLUE}Test 10: Get User Analytics${NC}"
 ANALYTICS_RESPONSE=$(curl -s -X GET "$BASE_URL/analytics/user/$USER_ID" \
     -H "Authorization: Bearer $TOKEN")
 print_result $? "Get User Analytics"
+
+# Insurance Tests
+echo -e "\n${BLUE}Testing Insurance Endpoints${NC}"
+
+# 11. Get all insurance plans
+echo -e "\n${BLUE}Test 11: Get All Insurance Plans${NC}"
+PLANS_RESPONSE=$(curl -s -X GET "$BASE_URL/insurance/plans" \
+    -H "Authorization: Bearer $TOKEN")
+if [[ $PLANS_RESPONSE == *"\"success\":true"* ]]; then
+    print_result 0 "Get All Insurance Plans"
+else
+    print_result 1 "Get All Insurance Plans"
+fi
+
+# 12. Get specific plan details
+echo -e "\n${BLUE}Test 12: Get Specific Plan Details${NC}"
+PLAN_ID=$(echo $PLANS_RESPONSE | grep -o '"id":"[^"]*' | head -1 | grep -o '[^"]*$')
+if [ -n "$PLAN_ID" ]; then
+    PLAN_RESPONSE=$(curl -s -X GET "$BASE_URL/insurance/plans/$PLAN_ID" \
+        -H "Authorization: Bearer $TOKEN")
+    if [[ $PLAN_RESPONSE == *"\"success\":true"* ]]; then
+        print_result 0 "Get Specific Plan Details"
+    else
+        print_result 1 "Get Specific Plan Details"
+    fi
+else
+    print_result 1 "Get Specific Plan Details (No plan ID found)"
+fi
+
+# 13. Calculate potential discounts
+echo -e "\n${BLUE}Test 13: Calculate Potential Discounts${NC}"
+DISCOUNT_RESPONSE=$(curl -s -X GET "$BASE_URL/insurance/calculate-discount" \
+    -H "Authorization: Bearer $TOKEN")
+if [[ $DISCOUNT_RESPONSE == *"\"success\":true"* ]]; then
+    print_result 0 "Calculate Potential Discounts"
+else
+    print_result 1 "Calculate Potential Discounts"
+fi
+
+# 14. Enroll in insurance plan
+echo -e "\n${BLUE}Test 14: Enroll in Insurance Plan${NC}"
+if [ -n "$PLAN_ID" ]; then
+    ENROLL_RESPONSE=$(curl -s -X POST "$BASE_URL/insurance/enroll" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"planId\": \"$PLAN_ID\"}")
+    if [[ $ENROLL_RESPONSE == *"\"success\":true"* ]]; then
+        print_result 0 "Enroll in Insurance Plan"
+    else
+        print_result 1 "Enroll in Insurance Plan"
+    fi
+else
+    print_result 1 "Enroll in Insurance Plan (No plan ID found)"
+fi
+
+# 15. Get current insurance details
+echo -e "\n${BLUE}Test 15: Get Current Insurance Details${NC}"
+CURRENT_INSURANCE_RESPONSE=$(curl -s -X GET "$BASE_URL/insurance/current" \
+    -H "Authorization: Bearer $TOKEN")
+if [[ $CURRENT_INSURANCE_RESPONSE == *"\"success\":true"* ]]; then
+    print_result 0 "Get Current Insurance Details"
+else
+    print_result 1 "Get Current Insurance Details"
+fi
 
 # Print summary
 echo -e "\n${BLUE}Test Summary:${NC}"

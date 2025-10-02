@@ -4,13 +4,15 @@ const db = require('../config/database');
 class Event {
   static TYPES = {
     DAILY_LOGIN: { type: 'daily_login', points: 5 },
-    LOG_WORKOUT: { type: 'log_workout', points: 10 },
+    LOG_WORKOUT: { type: 'exercise', points: 10 },  // Changed to match insurance test
     READ_ARTICLE: { type: 'read_article', points: 7 },
     VIEW_POLICY: { type: 'view_policy', points: 15 },
     COMPLETE_CHALLENGE: { type: 'complete_challenge', points: 50 },
     INVITE_FRIEND: { type: 'invite_friend', points: 20 },
     SHARE_ACHIEVEMENT: { type: 'share_achievement', points: 5 },
-    USE_NEW_FEATURE: { type: 'use_new_feature', points: 30 }
+    USE_NEW_FEATURE: { type: 'use_new_feature', points: 30 },
+    HEALTH_SCORE: { type: 'health_score', points: 15 },  // Added for insurance
+    CHECKUP: { type: 'checkup', points: 25 }  // Added for insurance
   };
 
   static async create(userId, eventType, metadata = {}) {

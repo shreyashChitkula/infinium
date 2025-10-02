@@ -8,7 +8,10 @@ const router = express.Router();
 
 // Record a new event
 router.post('/', auth, [
-  body('eventType').isString().isIn(Object.keys(Event.TYPES)),
+  body('eventType').isString().custom(value => {
+    const validTypes = Object.values(Event.TYPES).map(t => t.type);
+    return validTypes.includes(value);
+  }),
   body('metadata').optional().isObject()
 ], async (req, res) => {
   try {
