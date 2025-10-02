@@ -113,6 +113,24 @@ else
     print_result 1 "Unauthorized Access Rejection"
 fi
 
+# 8. Test Challenge Creation
+echo -e "\n${BLUE}Test 8: Create Challenge${NC}"
+CHALLENGE_RESPONSE=$(curl -s -X GET "$BASE_URL/challenges/personalized" \
+    -H "Authorization: Bearer $TOKEN")
+print_result $? "Create Personalized Challenge"
+
+# 9. Test Leaderboard
+echo -e "\n${BLUE}Test 9: Get Leaderboard${NC}"
+LEADERBOARD_RESPONSE=$(curl -s -X GET "$BASE_URL/leaderboard" \
+    -H "Authorization: Bearer $TOKEN")
+print_result $? "Get Leaderboard"
+
+# 10. Test Analytics
+echo -e "\n${BLUE}Test 10: Get User Analytics${NC}"
+ANALYTICS_RESPONSE=$(curl -s -X GET "$BASE_URL/analytics/user/$USER_ID" \
+    -H "Authorization: Bearer $TOKEN")
+print_result $? "Get User Analytics"
+
 # Print summary
 echo -e "\n${BLUE}Test Summary:${NC}"
 echo -e "${GREEN}Passed: $PASS${NC}"

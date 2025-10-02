@@ -6,6 +6,9 @@ const helmet = require('helmet');
 
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
+const challengeRoutes = require('./routes/challenges');
+const leaderboardRoutes = require('./routes/leaderboard');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 
@@ -18,6 +21,9 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
